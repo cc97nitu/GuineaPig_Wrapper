@@ -3,16 +3,53 @@ import numpy as np
 from scipy.stats import truncnorm
 from .Settings import AcceleratorConfig
 
-def dump_coordinates(cur_workdir, coords: np.array, positron: bool):
-    if not len(coords.shape) == 2 or coords.shape[1] != 6:
-        raise RuntimeError("coordinate array must have shape (N,6)")
+try:
+    import xtrack
+    xtrack_loaded = True
+except ImportError:
+    xtrack_loaded = False
 
+try:
+    import RF_Track
+    rf_track_loaded = True
+except ImportError:
+    rf_track_loaded = False
+
+
+def dump_coordinates(cur_workdir, coords: np.ndarray | xtrack.particles.particles.Particles, positron: bool):
+    if type(coords) == np.ndarray:
+        if not len(coords.shape) == 2 or coords.shape[1] != 6:
+            raise ValueError("coordinate array must have shape (N,6)")
+    elif xtrack_loaded and isinstance(coords, xtrack.particles.particles.Particles):
+        particles = coords
+        coords = np.empty((6,len(particles.x)))
+
+        coords[:,0] = particles.energy / 1e9  # [GeV]
+        coords[:,1] = particles.x * 1e6  # [um]
+        coords[:,2] = particles.y * 1e6  # [um]
+        coords[:,3] = particles.zeta * 1e6  # [um]
+        coords[:,4] = particles.px * 1e6
+        coords[:,5] = particles.py * 1e6
+    elif rf_track_loaded and isinstance(coords, RF_Track.Bunch6d):
+        particles = coords
+        coords = np.empty((6,len(particles.x)))
+
+        coords[:,0] = particles.get_phase_space("%K") / 1e3  # [GeV]
+        coords[:,1] = particles.get_phase_space("%x") * 1e3  # [um]
+        coords[:,2] = particles.get_phase_space("%y") * 1e3  # [um]
+        coords[:,3] = particles.get_phase_space("%t") * 1e3 * RF_Track.clight  # [um]
+        coords[:,4] = particles.get_phase_space("%xp") * 1e3
+        coords[:,5] = particles.get_phase_space("%yp") * 1e3
+    else:
+        raise ValueError("coords must be of either np.ndarray or xtrack.particles.particles.Particles type")
+    
     if positron:
         fname = "positron.ini"
     else:
         fname = "electron.ini"
-    
+
     np.savetxt(os.path.join(cur_workdir,fname), coords)
+
     return
 
 

@@ -1,4 +1,5 @@
 import os
+from __future__ import annotations
 import numpy as np
 from scipy.stats import truncnorm
 from .Settings import AcceleratorConfig
@@ -48,7 +49,7 @@ def dump_coordinates(cur_workdir, coords: np.ndarray | xtrack.particles.particle
     else:
         fname = "electron.ini"
 
-    np.savetxt(os.path.join(cur_workdir,fname), coords)
+    np.savetxt(os.path.join(cur_workdir,fname), coords, fmt="%.12f")  # apparantly neither GP or GP++ can parse numbers in the format 1.2E-3
 
     return
 
@@ -94,7 +95,7 @@ def sampleGaussianWaist(accelerator: AcceleratorConfig, cut: int = 3, N: int = 1
     beam_1 = [
         truncnorm.rvs(-cut, cut, loc=0, scale=np.sqrt(ex_1 * betx_1), size=N),
         truncnorm.rvs(-cut, cut, loc=0, scale=np.sqrt(ey_1 * bety_1), size=N),
-        truncnorm.rvs(-cut, cut, loc=0, scale=sigma_z_1, size=N),
+        truncnorm.rvs(-cut, cut, loc=0,electron scale=sigma_z_1, size=N),
         truncnorm.rvs(-cut, cut, loc=0, scale=np.sqrt(ex_1 * 1/betx_1), size=N),
         truncnorm.rvs(-cut, cut, loc=0, scale=np.sqrt(ey_1 * 1/bety_1), size=N),
     ]

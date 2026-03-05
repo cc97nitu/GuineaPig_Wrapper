@@ -213,7 +213,7 @@ class SimulationConfig:
     compt_emax: float = 10000.0
     compt_x_min: float = 0.01
 
-    load_beam: int = 0
+    load_beam: int = 3
     load_photons: int = 0
     store_photons: int = 0
 

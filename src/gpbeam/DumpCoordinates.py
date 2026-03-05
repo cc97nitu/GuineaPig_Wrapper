@@ -23,7 +23,7 @@ def dump_coordinates(cur_workdir, coords: np.ndarray | xtrack.particles.particle
             raise ValueError("coordinate array must have shape (N,6)")
     elif xtrack_loaded and isinstance(coords, xtrack.particles.particles.Particles):
         particles = coords
-        coords = np.empty((6,len(particles.x)))
+        coords = np.empty((len(particles.x),6))
 
         coords[:,0] = particles.energy / 1e9  # [GeV]
         coords[:,1] = particles.x * 1e6  # [um]
@@ -33,7 +33,7 @@ def dump_coordinates(cur_workdir, coords: np.ndarray | xtrack.particles.particle
         coords[:,5] = particles.py * 1e6
     elif rf_track_loaded and isinstance(coords, RF_Track.Bunch6d):
         particles = coords
-        coords = np.empty((6,len(particles.x)))
+        coords = np.empty((len(particles.x),6))
 
         coords[:,0] = particles.get_phase_space("%K") / 1e3  # [GeV]
         coords[:,1] = particles.get_phase_space("%x") * 1e3  # [um]

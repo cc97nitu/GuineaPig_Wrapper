@@ -311,6 +311,7 @@ class GuineaPig:
             print("Warning: particles outside of grid, miss rate = ", simulation_result.extra["miss"])
 
         if retain_files:
+            print("INFO: current working directory " + cur_workdir)
             with open(os.path.join(cur_workdir, "guinea.log"), "w") as logfile:
                 logfile.write(result.stdout)
         else:

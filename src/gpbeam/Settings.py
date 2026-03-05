@@ -1,20 +1,23 @@
-import re
 import copy
-from dataclasses import dataclass, asdict, is_dataclass
-from typing import Tuple
+from dataclasses import dataclass, asdict
+from typing import Union, Tuple
 
 
 # ============================================================
 # Type aliases
 # ============================================================
 
-Number2 = Tuple[float, float]
-Int2 = Tuple[int, int]
-
+Number2 = Union[float, Tuple[float, float]]
+Int2 = Union[int, Tuple[int, int]]
 
 # ============================================================
 # Validation helpers
 # ============================================================
+
+def _to_len2(value, name):
+    if isinstance(value, (int, float)):
+        return (value, value)
+    return value
 
 def _validate_len2(name: str, value):
     if not (isinstance(value, tuple) and len(value) == 2):
@@ -46,6 +49,48 @@ def _is_power_of_two(n: int) -> bool:
 
 @dataclass
 class AcceleratorConfig:
+    """
+    Properties of the accelerator.
+
+    Parameters
+    ----------
+    particles : tuple[float, float]
+        Number of particles per bunch [10^10]
+
+    energy : tuple[float, float]
+        Beam energy [GeV]
+
+    espread : tuple[float, float]
+        Relative energy spread [1]
+
+    emitt_x, emitt_y : tuple[float, float]
+        Horizontal/vertical emittance [μm]
+
+    beta_x, beta_y : tuple[float, float]
+        Beta functions at IP [mm]
+
+    sigma_x, sigma_y : tuple[float, float]
+        RMS beam sizes [nm]
+
+    sigma_z : tuple[float, float]
+        RMS beam sizes [μm]
+    
+    f_rep : float
+        Repetition frequency [Hz]
+
+    n_b : int
+        Number of bunches [1]
+
+    offset_x, offset_y : tuple[float, float]
+        Horizontal/vertical beam offset [nm]
+    
+    waist_x, waist_y : tuple[float, float]
+        Horizontal/vertical waist shift [μm]
+
+    angle_x, angle_y : tuple[float, float]
+        Bunch inclination not compensated by crab scheme [rad]
+    """
+    
     # Beam properties
     particles: Number2
     energy: Number2
@@ -84,15 +129,26 @@ class AcceleratorConfig:
     def __post_init__(self):
 
         # Validate tuple length
-        for name in [
+        len2_fields = [
             "particles", "energy", "espread",
             "which_espread",
             "sigma_x", "sigma_y", "sigma_z",
             "dist_z",
             "emitt_x", "emitt_y",
             "beta_x", "beta_y",
-            "angle_x", "angle_y", "angle_phi"
-        ]:
+            "angle_x", "angle_y", "angle_phi",
+            "offset_x", "offset_y",
+            "waist_x", "waist_y",
+        ]
+
+        # --- Auto-expand scalars ---
+        for name in len2_fields:
+            value = getattr(self, name)
+            value = _to_len2(value, name)
+            setattr(self, name, value)
+
+        # --- Now validate ---
+        for name in len2_fields:
             _validate_len2(name, getattr(self, name))
 
         # which_espread allowed values
@@ -227,8 +283,19 @@ class SimulationConfig:
 
     def __post_init__(self):
 
-        # tuple validation
-        _validate_len2("n_m", self.n_m)
+        len2_fields = [
+            "n_m",
+        ]
+
+        # --- Auto-expand scalars ---
+        for name in len2_fields:
+            value = getattr(self, name)
+            value = _to_len2(value, name)
+            setattr(self, name, value)
+
+        # --- Now validate ---
+        for name in len2_fields:
+            _validate_len2(name, getattr(self, name))
 
         # positivity
         for name in ["n_x", "n_y", "n_z", "n_t"]:

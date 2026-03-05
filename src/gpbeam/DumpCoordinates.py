@@ -1,5 +1,5 @@
-import os
 from __future__ import annotations
+import os
 import numpy as np
 from scipy.stats import truncnorm
 from .Settings import AcceleratorConfig
@@ -95,7 +95,7 @@ def sampleGaussianWaist(accelerator: AcceleratorConfig, cut: int = 3, N: int = 1
     beam_1 = [
         truncnorm.rvs(-cut, cut, loc=0, scale=np.sqrt(ex_1 * betx_1), size=N),
         truncnorm.rvs(-cut, cut, loc=0, scale=np.sqrt(ey_1 * bety_1), size=N),
-        truncnorm.rvs(-cut, cut, loc=0,electron scale=sigma_z_1, size=N),
+        truncnorm.rvs(-cut, cut, loc=0, scale=sigma_z_1, size=N),
         truncnorm.rvs(-cut, cut, loc=0, scale=np.sqrt(ex_1 * 1/betx_1), size=N),
         truncnorm.rvs(-cut, cut, loc=0, scale=np.sqrt(ey_1 * 1/bety_1), size=N),
     ]

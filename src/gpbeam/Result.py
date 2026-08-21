@@ -1,5 +1,5 @@
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from typing import Dict
 
 
@@ -9,6 +9,9 @@ class BeamResult:
     energy_loss: float
     avg_photon_energy: float
     photons_per_particle: float
+
+    def as_dict(self):
+        return asdict(self)
 
 
 @dataclass
@@ -25,6 +28,9 @@ class GeneralResults:
     E_cm: float
     E_cm_var: float
 
+    def as_dict(self):
+        return asdict(self)
+
 
 @dataclass
 class GuineaPigOutput:
@@ -34,6 +40,9 @@ class GuineaPigOutput:
 
     # additional scalar key=value style results
     extra: Dict[str, float] = field(default_factory=dict)
+
+    def as_dict(self):
+        return asdict(self)
 
 
 # -------------------------------------------------

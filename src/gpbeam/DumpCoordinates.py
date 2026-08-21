@@ -51,7 +51,7 @@ def dump_coordinates(cur_workdir, coords: np.ndarray | xtrack.particles.particle
 
     np.savetxt(os.path.join(cur_workdir,fname), coords, fmt="%.12f")  # apparantly neither GP or GP++ can parse numbers in the format 1.2E-3
 
-    return
+    return coords.shape[0]
 
 
 def sampleGaussianWaist(accelerator: AcceleratorConfig, cut: int = 3, N: int = 100000,):

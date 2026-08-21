@@ -15,14 +15,14 @@ def max_beamsize(beta, ex, l):
 # accerlerator setup
 acc = gp.AcceleratorConfig(
     particles=(2,2),
-    energy=(275,275),
-    espread=(1.5e-3,1.5e-3),
-    emitt_x=(5,5),
-    emitt_y=(0.035,0.035),
+    energy=(190,190),
+    espread=(1.24e-3,0.7e-3),
+    emitt_x=(7.5,7.5),
+    emitt_y=(0.027,0.027),
     sigma_z=(300,300),
-    beta_x=(13,13),
-    beta_y=(0.41,0.41),
-    f_rep=10,
+    beta_x=(11,11),
+    beta_y=(0.48,0.48),
+    f_rep=5,
     n_b=1312,
 )
 

@@ -278,19 +278,21 @@ class GuineaPig:
                   
         # initial conditions
         if particles_1 is not None and particles_2 is not None:
-            dump_coordinates(cur_workdir, particles_1,positron=False)
-            dump_coordinates(cur_workdir, particles_2,positron=True)
+            np_1 = dump_coordinates(cur_workdir, particles_1,positron=False)
+            np_2 = dump_coordinates(cur_workdir, particles_2,positron=True)
         elif particles_1 is not None and particles_2 is None:
-            dump_coordinates(cur_workdir, particles_1,positron=False)
-            dump_coordinates(cur_workdir, particles_1,positron=True)
+            np_1 = dump_coordinates(cur_workdir, particles_1,positron=False)
+            np_2 = dump_coordinates(cur_workdir, particles_1,positron=True)
         elif particles_1 is None and particles_2 is None:
-            pass
             particles_1, particles_2 = sampleGaussianWaist(self.accelerator)
 
-            dump_coordinates(cur_workdir, particles_1,positron=False)
-            dump_coordinates(cur_workdir, particles_2,positron=True)
+            np_1 = dump_coordinates(cur_workdir, particles_1,positron=False)
+            np_2 = dump_coordinates(cur_workdir, particles_2,positron=True)
         else:
             raise ValueError("particles_2 must be None if particles_1 is not provided")
+
+        # enforce total bunch charge
+        self.simulation.n_m = (np_1, np_2)
         
         # call guinea <- guinea seems to read from stdin always as interactive program <- feed it with fake stdin
         out_file = os.path.join(cur_workdir, "g++_result.out")

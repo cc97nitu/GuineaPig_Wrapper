@@ -270,12 +270,6 @@ class GuineaPig:
         cur_workdir = os.path.normpath(WORKDIR +"/workdir_guinea_" + str(unique_id))
         os.makedirs(cur_workdir, exist_ok=False)
 
-        # ensure proper configuration
-        _ = self.accelerator
-        _ = self.simulation
-
-        self.save(os.path.join(cur_workdir, "acc.dat"))
-                  
         # initial conditions
         if particles_1 is not None and particles_2 is not None:
             np_1 = dump_coordinates(cur_workdir, particles_1,positron=False)
@@ -284,16 +278,22 @@ class GuineaPig:
             np_1 = dump_coordinates(cur_workdir, particles_1,positron=False)
             np_2 = dump_coordinates(cur_workdir, particles_1,positron=True)
         elif particles_1 is None and particles_2 is None:
-            particles_1, particles_2 = sampleGaussianWaist(self.accelerator)
+            particles_1, particles_2 = sampleGaussianWaist(self.accelerator, N=17)
 
             np_1 = dump_coordinates(cur_workdir, particles_1,positron=False)
             np_2 = dump_coordinates(cur_workdir, particles_2,positron=True)
         else:
             raise ValueError("particles_2 must be None if particles_1 is not provided")
 
-        # enforce total bunch charge
-        self.simulation.n_m = (np_1, np_2)
-        
+
+        # ensure proper configuration
+        _ = self.accelerator
+        _ = self.simulation
+
+        self.simulation.n_m = (np_1, np_2) # enforce total bunch charge
+
+        self.save(os.path.join(cur_workdir, "acc.dat"))
+                  
         # call guinea <- guinea seems to read from stdin always as interactive program <- feed it with fake stdin
         out_file = os.path.join(cur_workdir, "g++_result.out")
         with open(os.devnull, "r") as nullin:

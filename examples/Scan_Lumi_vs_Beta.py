@@ -1,4 +1,5 @@
 import itertools
+import argparse
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import numpy as np
@@ -7,9 +8,20 @@ import pandas as pd
 import gpbeam as gp
 
 
+parser = argparse.ArgumentParser(
+    description="Compute luminosity as a function of the beta function."
+)
+parser.add_argument(
+    "-o", "--output",
+    default="Lumi_vs_BetaFunction.csv",
+    metavar="FILE",
+    help="Output CSV file name (default: %(default)s)",
+)
+args = parser.parse_args()
+
+
 def max_beamsize(beta, ex, l):
     return np.sqrt(beta * ex) + l * np.sqrt(1/beta * ex)
-
 
 
 # accerlerator setup
@@ -115,4 +127,4 @@ if __name__ == "__main__":
 
     # save results
     results = pd.DataFrame(results)
-    #results.to_csv("Lumi_vs_BetaFunction.csv")
+    results.to_csv(args.output)
